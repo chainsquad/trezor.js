@@ -349,6 +349,51 @@ export default class Session extends EventEmitter {
     ): Promise<bitcoin.HDNode> {
         return hdnodeUtils.getHDNode(this, path, coinNetwork(network));
     }
+
+    /*
+     * STEEM
+     */
+    getSteemPubkey(
+        address_n: Array<number>,
+        show_display: ?boolean
+    ): Promise<MessageResponse<SteemPublicKey>> {
+        return this.typedCall('SteemGetPublicKey', 'SteemPublicKey', {
+            address_n: address_n,
+            show_display: !!show_display,
+        }).then(res => {
+            return res;
+        });
+    }
+
+    steemTransfer(
+        from: string,
+	to: string,
+	amount: number,
+	asset: string,
+	memo: string
+    ): Promise<MessageResponse<trezor.SteemTxSignature>> {
+	var transfer: trezor.SteemOperationTransfer = {
+		from: from,
+		to: to,
+		amount: amount,
+		asset: asset,
+		memo: memo
+	}
+	var ref_block_num = 1241241;
+	var ref_block_prefix = 1242144;
+	var expiration = 341412242;
+        return this.typedCall('SteemSignTx', 'SteemTxSignature', {
+	    ref_block_num: ref_block_num,
+	    ref_block_prefix: ref_block_prefix,
+	    expiration: expiration,
+	    transfer: transfer
+        }).then(res => {
+            return res;
+        });
+    }
+
+
+
 }
 
 export function coinName(coin: trezor.CoinType | string): string {

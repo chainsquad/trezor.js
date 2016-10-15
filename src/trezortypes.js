@@ -168,6 +168,30 @@ export type PublicKey = {
     xpub: string;
 };
 
+export type SteemPublicKey = {
+    pubkey: string;
+};
+
+export type SteemTxSignature = {
+    signature: string;
+    digest: string;  // debugging
+};
+
+export type SteemOperationTransfer = {
+    from: string;
+    to: string;
+    amount: number;
+    asset: string;
+    memo: string;
+}
+
+export type SteemSignTx = {
+    ref_block_num: number;
+    ref_block_prefix: number;
+    expiration: number;
+    transfer: SteemOperationTransfer;
+}
+
 // this is what Trezor asks for
 export type SignTxInfoToTrezor = {
     inputs: Array<TransactionInput>

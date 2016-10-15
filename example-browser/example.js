@@ -9,7 +9,7 @@ var trezor = window.trezor;
 
 // DeviceList encapsulates transports, sessions, device enumeration and other
 // low-level things, and provides easy-to-use event interface.
-var list = new trezor.DeviceList({debug: true});
+var list = new trezor.DeviceList({debug: false});
 
 list.on('connect', function (device) {
     console.log('Connected a device:', device);
@@ -32,30 +32,27 @@ list.on('connect', function (device) {
 
     var hardeningConstant = 0x80000000;
 
-    // low level API
-    device.waitForSessionAndRun(function (session) {
-        console.log("I will call now.");
-
-        return session.typedCall("GetEntropy", "Entropy", {size: 10}).then(entropy => {
-            console.log("I have called now.");
-            console.log("Random hex-string is " + entropy.message.entropy);
-        });
-    }).then(function() {
-
-        // high level API
-        // Ask the device to show first address of first account on display and return it
-        device.waitForSessionAndRun(function (session) {
-            return session.getAddress([
-                (44 | hardeningConstant) >>> 0,
-                (0 | hardeningConstant) >>> 0,
-                (0 | hardeningConstant) >>> 0,
-                0,
-                0
-            ], 'bitcoin', true)
-        })
-        .then(function (result) {
-            console.log('Address:', result.message.address);
-        })
+    // high level API
+    return device.waitForSessionAndRun(function (session) {
+        return session.steemTransfer(
+                "fabian",
+                "xeroc",
+                10001,
+                "SBD",
+                null);
+	/*
+        return session.getSteemPubkey([], true)
+        return session.getSteemPubkey([
+            (44 | hardeningConstant) >>> 0,
+            (0 | hardeningConstant) >>> 0,
+            (0 | hardeningConstant) >>> 0,
+            0,
+            0
+        ], true)
+	*/
+    })
+    .then(function (result) {
+        console.log('Answer: ', result.message);
     })
     .catch(function (error) {
         // Errors can happen easily, i.e. when device is disconnected or request rejected
